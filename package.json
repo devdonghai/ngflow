@@ -1,0 +1,42 @@
+{
+  "name": "ngflow",
+  "version": "0.0.1",
+  "description": "NgFlow - An Angular library for building node-based editors and interactive flow charts, powered by the xyflow core.",
+  "keywords": [
+    "angular",
+    "node-based UI",
+    "graph",
+    "diagram",
+    "workflow",
+    "ngflow",
+    "ng-flow",
+    "xyflow"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/devdonghai/ngflow#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/devdonghai/ngflow.git"
+  },
+  "bugs": {
+    "url": "https://github.com/devdonghai/ngflow/issues"
+  },
+  "peerDependencies": {
+    "@angular/common": "^22.0.0",
+    "@angular/core": "^22.0.0"
+  },
+  "dependencies": {
+    "tslib": "^2.3.0",
+    "d3-drag": "^3.0.0",
+    "d3-interpolate": "^3.0.1",
+    "d3-selection": "^3.0.0",
+    "d3-zoom": "^3.0.0"
+  },
+  "exports": {
+    "./styles/style.css": "./styles/style.css",
+    "./styles/base.css": "./styles/base.css"
+  },
+  "sideEffects": [
+    "*.css"
+  ]
+}

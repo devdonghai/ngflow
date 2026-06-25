@@ -1,0 +1,173 @@
+import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+
+import type { PanelPosition } from '../../system';
+import type { FitViewOptions } from '../../types';
+import { PanelComponent } from '../../container/panel.component';
+import { injectStore } from '../../hooks/inject-store';
+import { ControlButtonComponent } from './control-button.component';
+
+/**
+ * Zoom / fit-view / interactivity controls. Angular port of Svelte Flow's
+ * `Controls`. Project extra buttons via `[ngFlowControlsBefore]`,
+ * `[ngFlowControlsAfter]` or default content.
+ *
+ * @public
+ */
+@Component({
+  selector: 'ng-flow-controls',
+  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [PanelComponent, ControlButtonComponent],
+  host: { style: 'display: contents' },
+  template: `
+    <ng-flow-panel [class]="panelClasses()" [position]="position()" [style]="style()">
+      <ng-content select="[ngFlowControlsBefore]" />
+
+      @if (showZoom()) {
+        <button
+          ngFlowControlButton
+          class="ng-flow__controls-zoomin"
+          [title]="aria()['controls.zoomIn.ariaLabel']"
+          [attr.aria-label]="aria()['controls.zoomIn.ariaLabel']"
+          [disabled]="maxZoomReached()"
+          [bgColor]="buttonBgColor()"
+          [bgColorHover]="buttonBgColorHover()"
+          [color]="buttonColor()"
+          [colorHover]="buttonColorHover()"
+          [borderColor]="buttonBorderColor()"
+          (click)="onZoomIn()"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+            <path
+              d="M32 18.133H18.133V32h-4.266V18.133H0v-4.266h13.867V0h4.266v13.867H32z"
+            />
+          </svg>
+        </button>
+        <button
+          ngFlowControlButton
+          class="ng-flow__controls-zoomout"
+          [title]="aria()['controls.zoomOut.ariaLabel']"
+          [attr.aria-label]="aria()['controls.zoomOut.ariaLabel']"
+          [disabled]="minZoomReached()"
+          [bgColor]="buttonBgColor()"
+          [bgColorHover]="buttonBgColorHover()"
+          [color]="buttonColor()"
+          [colorHover]="buttonColorHover()"
+          [borderColor]="buttonBorderColor()"
+          (click)="onZoomOut()"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 5">
+            <path d="M0 0h32v4.2H0z" />
+          </svg>
+        </button>
+      }
+
+      @if (showFitView()) {
+        <button
+          ngFlowControlButton
+          class="ng-flow__controls-fitview"
+          [title]="aria()['controls.fitView.ariaLabel']"
+          [attr.aria-label]="aria()['controls.fitView.ariaLabel']"
+          [bgColor]="buttonBgColor()"
+          [bgColorHover]="buttonBgColorHover()"
+          [color]="buttonColor()"
+          [colorHover]="buttonColorHover()"
+          [borderColor]="buttonBorderColor()"
+          (click)="onFitView()"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 30">
+            <path
+              d="M3.692 4.63c0-.53.4-.938.939-.938h5.215V0H4.708C2.13 0 0 2.054 0 4.63v5.216h3.692V4.631zM27.354 0h-5.2v3.692h5.17c.53 0 .984.4.984.939v5.215H32V4.631A4.624 4.624 0 0027.354 0zm.954 24.83c0 .532-.4.94-.939.94h-5.215v3.768h5.215c2.577 0 4.631-2.13 4.631-4.707v-5.139h-3.692v5.139zm-23.677.94c-.531 0-.939-.4-.939-.94v-5.138H0v5.139c0 2.577 2.13 4.707 4.708 4.707h5.138V25.77H4.631z"
+            />
+          </svg>
+        </button>
+      }
+
+      @if (showLock()) {
+        <button
+          ngFlowControlButton
+          class="ng-flow__controls-interactive"
+          [title]="aria()['controls.interactive.ariaLabel']"
+          [attr.aria-label]="aria()['controls.interactive.ariaLabel']"
+          [bgColor]="buttonBgColor()"
+          [bgColorHover]="buttonBgColorHover()"
+          [color]="buttonColor()"
+          [colorHover]="buttonColorHover()"
+          [borderColor]="buttonBorderColor()"
+          (click)="onToggleInteractivity()"
+        >
+          @if (isInteractive()) {
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 32">
+              <path
+                d="M21.333 10.667H19.81V7.619C19.81 3.429 16.38 0 12.19 0c-4.114 1.828-1.37 2.133.305 2.438 1.676.305 4.42 2.59 4.42 5.181v3.048H3.047A3.056 3.056 0 000 13.714v15.238A3.056 3.056 0 003.048 32h18.285a3.056 3.056 0 003.048-3.048V13.714a3.056 3.056 0 00-3.048-3.047zM12.19 24.533a3.056 3.056 0 01-3.047-3.047 3.056 3.056 0 013.047-3.048 3.056 3.056 0 013.048 3.048 3.056 3.056 0 01-3.048 3.047z"
+              />
+            </svg>
+          } @else {
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 32">
+              <path
+                d="M21.333 10.667H19.81V7.619C19.81 3.429 16.38 0 12.19 0 8 0 4.571 3.429 4.571 7.619v3.048H3.048A3.056 3.056 0 000 13.714v15.238A3.056 3.056 0 003.048 32h18.285a3.056 3.056 0 003.048-3.048V13.714a3.056 3.056 0 00-3.048-3.047zM12.19 24.533a3.056 3.056 0 01-3.047-3.047 3.056 3.056 0 013.047-3.048 3.056 3.056 0 013.048 3.048 3.056 3.056 0 01-3.048 3.047zm4.724-13.866H7.467V7.619c0-2.59 2.133-4.724 4.723-4.724 2.591 0 4.724 2.133 4.724 4.724v3.048z"
+              />
+            </svg>
+          }
+        </button>
+      }
+
+      <ng-content />
+      <ng-content select="[ngFlowControlsAfter]" />
+    </ng-flow-panel>
+  `,
+})
+export class ControlsComponent {
+  private readonly store = injectStore();
+
+  readonly position = input<PanelPosition>('bottom-left');
+  readonly orientation = input<'horizontal' | 'vertical'>('vertical');
+  readonly showZoom = input<boolean>(true);
+  readonly showFitView = input<boolean>(true);
+  readonly showLock = input<boolean>(true);
+  readonly style = input<string | undefined>(undefined);
+  readonly className = input<string | undefined>(undefined, { alias: 'class' });
+  readonly buttonBgColor = input<string | undefined>(undefined);
+  readonly buttonBgColorHover = input<string | undefined>(undefined);
+  readonly buttonColor = input<string | undefined>(undefined);
+  readonly buttonColorHover = input<string | undefined>(undefined);
+  readonly buttonBorderColor = input<string | undefined>(undefined);
+  readonly fitViewOptions = input<FitViewOptions | undefined>(undefined);
+
+  readonly aria = computed(() => this.store.ariaLabelConfig);
+  readonly isInteractive = computed(
+    () =>
+      this.store.nodesDraggable || this.store.nodesConnectable || this.store.elementsSelectable,
+  );
+  readonly minZoomReached = computed(() => this.store.viewport.zoom <= this.store.minZoom);
+  readonly maxZoomReached = computed(() => this.store.viewport.zoom >= this.store.maxZoom);
+
+  readonly panelClasses = computed(() =>
+    [
+      'ng-flow__controls',
+      this.orientation() === 'horizontal' ? 'horizontal' : 'vertical',
+      this.className(),
+    ]
+      .filter(Boolean)
+      .join(' '),
+  );
+
+  onZoomIn() {
+    this.store.zoomIn();
+  }
+
+  onZoomOut() {
+    this.store.zoomOut();
+  }
+
+  onFitView() {
+    this.store.fitView(this.fitViewOptions());
+  }
+
+  onToggleInteractivity() {
+    const interactive = !this.isInteractive();
+    this.store.nodesDraggable = interactive;
+    this.store.nodesConnectable = interactive;
+    this.store.elementsSelectable = interactive;
+  }
+}

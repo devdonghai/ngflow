@@ -1,0 +1,22 @@
+/* To learn more about Typescript configuration file: https://www.typescriptlang.org/docs/handbook/tsconfig-json.html. */
+/* To learn more about Angular compiler options: https://angular.dev/reference/configs/angular-compiler-options. */
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "../../out-tsc/lib",
+    "declaration": true,
+    "declarationMap": true,
+    "types": [],
+    /*
+     * The vendored framework-agnostic core (src/lib/system) is upstream
+     * @xyflow/system, bundled with rollup and not authored against these
+     * extra-strict flags. Relax them for the library build so the vendored
+     * source stays faithful to upstream.
+     */
+    "noImplicitReturns": false,
+    "noPropertyAccessFromIndexSignature": false,
+    "noFallthroughCasesInSwitch": false
+  },
+  "include": ["src/**/*.ts", "src/**/*.d.ts"],
+  "exclude": ["**/*.spec.ts"]
+}
