@@ -144,4 +144,5 @@ ng serve demo             # run the example app
 
 ## License
 
-MIT — same as the upstream xyflow project.
+[MIT](./LICENSE) © NgFlow contributors. This project is a port of, and builds
+upon, the MIT-licensed [xyflow](https://github.com/xyflow/xyflow) project.
