@@ -1,4 +1,4 @@
-# xyflow-angular
+# NgFlow
 
 An Angular port of [xyflow](https://github.com/xyflow/xyflow) (React Flow / Svelte
 Flow) — a highly customizable component for building node-based editors, workflow
@@ -27,7 +27,7 @@ reactivity, mirroring the Svelte Flow architecture.
 ## Installation
 
 ```bash
-npm install xyflow-angular
+npm install ngflow
 ```
 
 The `d3-drag`, `d3-selection`, `d3-zoom` and `d3-interpolate` runtime
@@ -40,10 +40,14 @@ global `styles.css`):
 
 ```json
 "styles": [
-  "node_modules/xyflow-angular/styles/style.css",
+  "node_modules/ngflow/styles/style.css",
   "src/styles.css"
 ]
 ```
+
+`style.css` is the full default theme. For a minimal, unstyled base (just the
+structural rules needed for layout) use `node_modules/ngflow/styles/base.css`
+instead.
 
 ## Quick start
 
@@ -57,7 +61,7 @@ import {
   MiniMapComponent,
   type Node,
   type Edge,
-} from 'xyflow-angular';
+} from 'ngflow';
 
 @Component({
   selector: 'app-root',
@@ -100,7 +104,7 @@ handles with `<ng-flow-handle>`:
 
 ```ts
 import { Component } from '@angular/core';
-import { HandleComponent, Position } from 'xyflow-angular';
+import { HandleComponent, Position } from 'ngflow';
 
 @Component({
   selector: 'app-my-node',
@@ -126,7 +130,7 @@ readonly nodeTypes = { myNode: MyNode };
 Inject the flow instance to drive the canvas imperatively:
 
 ```ts
-import { injectFlow } from 'xyflow-angular';
+import { injectFlow } from 'ngflow';
 
 const flow = injectFlow();
 flow.fitView();
@@ -137,10 +141,15 @@ const nodes = flow.getNodes();
 ## Building from source
 
 ```bash
-ng build xyflow-angular   # library -> dist/xyflow-angular
-ng build demo             # example app -> dist/demo
-ng serve demo             # run the example app
+npm install
+npm run build     # build styles + library -> dist/ngflow
+npm run watch     # rebuild on change
+npm test          # run the vitest suite
 ```
+
+The `npm run build` step first assembles the CSS bundles
+(`styles/dist/{style,base}.css`) via `styles/build-styles.mjs`, then runs
+`ng-packagr` to produce the publishable package in `dist/ngflow`.
 
 ## License
 
