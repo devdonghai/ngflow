@@ -8,7 +8,6 @@ import {
   effect,
   inject,
   input,
-  untracked,
   viewChild,
 } from '@angular/core';
 import { NgComponentOutlet } from '@angular/common';
@@ -19,6 +18,7 @@ import {
   isInputDOMNode,
   nodeHasDimensions,
   getNodesInside,
+  Position,
 } from '../system';
 
 import { FLOW_STORE, NODE_ID, NODE_CONNECTABLE, injectFlowStore } from '../store/context';
@@ -139,7 +139,15 @@ export class NodeWrapperComponent<NodeType extends Node = Node, EdgeType extends
     if (w === undefined && h === undefined && !style) {
       return null;
     }
-    return `${style};${w ? `width:${toPxString(w)};` : ''}${h ? `height:${toPxString(h)};` : ''}`;
+    // Assemble declarations and join with ';' so we never emit a leading or
+    // doubled separator (Angular's [style] parser rejects a malformed string
+    // such as ';width:..').
+    const declarations: string[] = [];
+    const trimmedStyle = style.trim().replace(/;\s*$/, '');
+    if (trimmedStyle) declarations.push(trimmedStyle);
+    if (w) declarations.push(`width:${toPxString(w)}`);
+    if (h) declarations.push(`height:${toPxString(h)}`);
+    return declarations.length ? `${declarations.join(';')};` : null;
   });
 
   readonly role = computed(
@@ -232,14 +240,20 @@ export class NodeWrapperComponent<NodeType extends Node = Node, EdgeType extends
     }
 
     // Recalculate handle positions when type/source/target position changes.
-    let prevType = untracked(this.type);
-    let prevSource = untracked(this.sourcePosition);
-    let prevTarget = untracked(this.targetPosition);
+    // The previous values are seeded on the effect's first run (once the
+    // required `node` input is available) rather than in the constructor, where
+    // reading the input would throw NG0950 in dev mode.
+    let prevType: string | undefined;
+    let prevSource: Position | undefined;
+    let prevTarget: Position | undefined;
+    let firstRun = true;
     effect(() => {
       const type = this.type();
       const source = this.sourcePosition();
       const target = this.targetPosition();
-      const doUpdate = type !== prevType || source !== prevSource || target !== prevTarget;
+      const doUpdate =
+        !firstRun && (type !== prevType || source !== prevSource || target !== prevTarget);
+      firstRun = false;
       const el = this.nodeRef()?.nativeElement ?? null;
       if (doUpdate && el !== null) {
         requestAnimationFrame(() => {

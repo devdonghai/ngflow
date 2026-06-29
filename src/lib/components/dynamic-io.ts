@@ -27,6 +27,13 @@ export function declaredInputNames(type: Type<unknown>): Set<string> {
 
 /**
  * Filters `props` to only the keys declared as inputs on `type`.
+ *
+ * Keys whose value is `undefined` are skipped so the component's own input
+ * default is preserved: `NgComponentOutlet` calls `setInput` for every key in
+ * the record, and `setInput(name, undefined)` would clobber a built-in node's
+ * default (e.g. `sourcePosition = Position.Bottom`) — leaving handles with a
+ * `ng-flow__handle-undefined` class that no stylesheet positions. This mirrors
+ * the React/Svelte semantics where an omitted prop falls back to its default.
  */
 export function pickDeclaredInputs(
   type: Type<unknown>,
@@ -35,7 +42,7 @@ export function pickDeclaredInputs(
   const declared = declaredInputNames(type);
   const result: Record<string, unknown> = {};
   for (const key of Object.keys(props)) {
-    if (declared.has(key)) {
+    if (declared.has(key) && props[key] !== undefined) {
       result[key] = props[key];
     }
   }

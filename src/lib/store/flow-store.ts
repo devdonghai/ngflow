@@ -102,7 +102,6 @@ function getInitialViewport<NodeType extends Node = Node>(
 export class NgFlowStore<NodeType extends Node = Node, EdgeType extends Edge = Edge> {
   constructor(private readonly signals: StoreSignals<NodeType, EdgeType>) {
     const props = untracked(this.signals.props);
-    this.fitViewQueued = props.fitView ?? false;
     this.fitViewOptions = props.fitViewOptions;
 
     this._viewport = signal<Viewport>(
@@ -205,6 +204,14 @@ export class NgFlowStore<NodeType extends Node = Node, EdgeType extends Edge = E
         zIndexMode: this.zIndexMode,
       },
     );
+
+    // Seed the fitView queue from the (now-bound) prop exactly once.
+    if (!this.fitViewSeeded) {
+      this.fitViewSeeded = true;
+      if (this.p().fitView) {
+        this.fitViewQueued = true;
+      }
+    }
 
     if (this.fitViewQueued && nodesInitialized) {
       if (this.fitViewOptions?.duration) {
@@ -465,7 +472,12 @@ export class NgFlowStore<NodeType extends Node = Node, EdgeType extends Edge = E
   }
 
   // --- fitView state (plain mutable fields, like Svelte) ---
-  fitViewQueued: boolean;
+  // Seeded lazily from the `fitView` prop on the first `_nodesInitialized` run
+  // rather than in the constructor: the store is built via a field initializer
+  // while the host component is still constructing, before Angular has bound the
+  // `[fitView]` input, so reading it in the constructor always sees `undefined`.
+  fitViewQueued = false;
+  private fitViewSeeded = false;
   fitViewOptions: FitViewOptions<NodeType> | undefined;
   fitViewResolver: PromiseWithResolvers<boolean> | null = null;
 

@@ -13,6 +13,13 @@
     "xyflow"
   ],
   "license": "MIT",
+  "scripts": {
+    "styles": "node ./styles/build-styles.mjs",
+    "build": "npm run styles && ng-packagr -p ng-package.json -c tsconfig.lib.prod.json",
+    "build:lib": "npm run build",
+    "watch": "npm run styles && ng-packagr -p ng-package.json -c tsconfig.lib.prod.json --watch",
+    "test": "vitest run"
+  },
   "homepage": "https://github.com/devdonghai/ngflow#readme",
   "repository": {
     "type": "git",
@@ -38,5 +45,24 @@
   },
   "sideEffects": [
     "*.css"
-  ]
+  ],
+  "devDependencies": {
+    "@angular/common": "^22.0.0",
+    "@angular/compiler": "^22.0.0",
+    "@angular/compiler-cli": "^22.0.0",
+    "@angular/core": "^22.0.0",
+    "@types/d3-drag": "^3.0.7",
+    "@types/d3-interpolate": "^3.0.4",
+    "@types/d3-selection": "^3.0.11",
+    "@types/d3-transition": "^3.0.9",
+    "@types/d3-zoom": "^3.0.8",
+    "jsdom": "^28.0.0",
+    "ng-packagr": "^22.0.0",
+    "postcss": "^8.4.0",
+    "postcss-nested": "^7.0.2",
+    "prettier": "^3.8.1",
+    "rxjs": "~7.8.0",
+    "typescript": "~6.0.2",
+    "vitest": "^4.0.8"
+  }
 }
