@@ -27,7 +27,7 @@ reactivity, mirroring the Svelte Flow architecture.
 ## Installation
 
 ```bash
-npm install ngflow
+npm install @devdonghai/ngflow
 ```
 
 The `d3-drag`, `d3-selection`, `d3-zoom` and `d3-interpolate` runtime
@@ -40,13 +40,13 @@ global `styles.css`):
 
 ```json
 "styles": [
-  "node_modules/ngflow/styles/style.css",
+  "node_modules/@devdonghai/ngflow/styles/style.css",
   "src/styles.css"
 ]
 ```
 
 `style.css` is the full default theme. For a minimal, unstyled base (just the
-structural rules needed for layout) use `node_modules/ngflow/styles/base.css`
+structural rules needed for layout) use `node_modules/@devdonghai/ngflow/styles/base.css`
 instead.
 
 ## Quick start
@@ -61,7 +61,7 @@ import {
   MiniMapComponent,
   type Node,
   type Edge,
-} from 'ngflow';
+} from '@devdonghai/ngflow';
 
 @Component({
   selector: 'app-root',
@@ -104,7 +104,7 @@ handles with `<ng-flow-handle>`:
 
 ```ts
 import { Component } from '@angular/core';
-import { HandleComponent, Position } from 'ngflow';
+import { HandleComponent, Position } from '@devdonghai/ngflow';
 
 @Component({
   selector: 'app-my-node',
@@ -130,7 +130,7 @@ readonly nodeTypes = { myNode: MyNode };
 Inject the flow instance to drive the canvas imperatively:
 
 ```ts
-import { injectFlow } from 'ngflow';
+import { injectFlow } from '@devdonghai/ngflow';
 
 const flow = injectFlow();
 flow.fitView();

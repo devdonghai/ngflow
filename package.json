@@ -1,5 +1,5 @@
 {
-  "name": "ngflow",
+  "name": "@devdonghai/ngflow",
   "version": "0.0.1",
   "description": "NgFlow - An Angular library for building node-based editors and interactive flow charts, powered by the xyflow core.",
   "keywords": [
